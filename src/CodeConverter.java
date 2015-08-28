@@ -63,6 +63,7 @@ class CodeConverter {
             BufferedReader in = new BufferedReader(
             new InputStreamReader(clientSocket.getInputStream()));
         ) {
+            System.out.println("Client connected...");
 
             //init variables
             String inputLine, outputLine;
@@ -76,17 +77,26 @@ class CodeConverter {
             //while we're receiving data from the client
             while ((inputLine = in.readLine()) != null) {
                 //process the line
+                System.out.println("Request: " + inputLine);
                 outputLine = protocol.processInput(inputLine);
 
-                //get the updated state
-                serverState = protocol.getState();
 
                 //print the output
                 out.println(outputLine);
+                System.out.println("Response: " + outputLine);
+
+                //check server state
+                serverState = protocol.getState();
+                switch (serverState) {
+                    case Bye:
+                        System.out.println("Client disconnected.");
+                        return false;
+                    case End:
+                        System.out.println("Server shutting down...");
+                        return true;
+                }
             }
 
-            //if the client sent an end state, the server will close
-            return serverState == CodeProtocolState.End;
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
                 + portNumber + " or listening for a connection");

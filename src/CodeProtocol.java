@@ -30,7 +30,7 @@ public class CodeProtocol {
         switch (input) {
             case "ASCII":
                 //transition to the ascii code state
-                state = CodeProtocolState.AC;
+                state = CodeProtocolState.CA;
                 return "ASCII: OK";
             case "AC":
                 //transition to the ascii code state
@@ -42,7 +42,7 @@ public class CodeProtocol {
                 return "CHANGE: OK\nASCII: OK";
             case "BYE":
                 //transition to the waiting state
-                state = CodeProtocolState.Waiting;
+                state = CodeProtocolState.Bye;
                 return "BYE: OK";
             case "END":
                 //transition to the end state
@@ -53,7 +53,7 @@ public class CodeProtocol {
         //processing current state
         Matcher m;
         switch (state) {
-            case AC:
+            case CA:
                 //classify input string
                 m = acPattern.matcher(input);
 
@@ -65,7 +65,7 @@ public class CodeProtocol {
 
                 //unsupported character
                 return "ERR\nASCII: OK";
-            case CA:
+            case AC:
                 //get char code from input
                 try {
                     //get byte value of string
@@ -97,5 +97,13 @@ public class CodeProtocol {
      */
     public CodeProtocolState getState() {
         return state;
+    }
+
+    /**
+     * Set the state of the protocol class
+     * @param state The state to set to
+     */
+    public void setState(CodeProtocolState state) {
+        this.state = state;
     }
 }

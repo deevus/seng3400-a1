@@ -70,6 +70,8 @@ class CodeClient {
             boolean running = true;
             while (running) {
                 //get command from client
+                System.out.print("Enter command to send to server "
+                    + "[AC,CA,BYE,END, or something to convert]: ");
                 fromUser = stdIn.readLine();
 
                 //if a command was provided
