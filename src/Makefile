@@ -1,5 +1,6 @@
 CLIENT_SRC := CodeClient.java
 SERVER_SRC := CodeConverter.java
+OTHER_SRC := CodeProtocol.java
 OUTDIR := ../bin
 JC := javac
 JFLAGS := -g -d $(OUTDIR)
@@ -15,4 +16,4 @@ client:
 	$(JC) $(JFLAGS) $(CLIENT_SRC)
 
 server:
-	$(JC) $(JFLAGS) $(SERVER_SRC)
+	$(JC) $(JFLAGS) $(SERVER_SRC) $(OTHER_SRC)
