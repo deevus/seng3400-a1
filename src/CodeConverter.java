@@ -4,12 +4,19 @@ import java.net.*;
 class CodeConverter {
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java KnockKnockServer <port number>");
+            System.err.println("Usage: java CodeConverter <port number>");
             System.exit(1);
         }
 
         int portNumber = Integer.parseInt(args[0]);
 
+        boolean ending = startServer(portNumber);
+        while (!ending) {
+            ending = startServer(portNumber);
+        }
+    }
+
+    static boolean startServer(int portNumber) {
         try (
             ServerSocket serverSocket = new ServerSocket(portNumber);
             Socket clientSocket = serverSocket.accept();
@@ -22,20 +29,22 @@ class CodeConverter {
             String inputLine, outputLine;
 
             // Initiate conversation with client
-            CodeProtocol kkp = new CodeProtocol();
-            outputLine = kkp.processInput(null);
-            out.println(outputLine);
-
+            CodeProtocol protocol = new CodeProtocol();
+            CodeProtocolState serverState = protocol.getState();
             while ((inputLine = in.readLine()) != null) {
-                outputLine = kkp.processInput(inputLine);
+                outputLine = protocol.processInput(inputLine);
+                serverState = protocol.getState();
                 out.println(outputLine);
-                if (outputLine.equals("Bye."))
-                    break;
             }
+
+            return serverState == CodeProtocolState.End;
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port "
                 + portNumber + " or listening for a connection");
             System.out.println(e.getMessage());
         }
+
+        //there was an error, so we'll end
+        return true;
     }
 }

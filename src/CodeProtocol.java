@@ -1,62 +1,59 @@
 import java.net.*;
 import java.io.*;
+import java.util.regex.*;
 
 public class CodeProtocol {
-    private static final int WAITING = 0;
-    private static final int SENTKNOCKKNOCK = 1;
-    private static final int SENTCLUE = 2;
-    private static final int ANOTHER = 3;
+    private CodeProtocolState state = CodeProtocolState.Waiting;
+    private Pattern acPattern = Pattern.compile("^[a-zA-Z0-9]$");
 
-    private static final int NUMJOKES = 5;
-
-    private int state = WAITING;
-    private int currentJoke = 0;
-
-    private String[] clues = { "Turnip", "Little Old Lady", "Atch", "Who", "Who" };
-    private String[] answers = { "Turnip the heat, it's cold in here!",
-                                 "I didn't know you could yodel!",
-                                 "Bless you!",
-                                 "Is there an owl in here?",
-                                 "Is there an echo in here?" };
-
-    public String processInput(String theInput) {
-        String theOutput = null;
-
-        if (state == WAITING) {
-            theOutput = "Knock! Knock!";
-            state = SENTKNOCKKNOCK;
-        } else if (state == SENTKNOCKKNOCK) {
-            if (theInput.equalsIgnoreCase("Who's there?")) {
-                theOutput = clues[currentJoke];
-                state = SENTCLUE;
-            } else {
-                theOutput = "You're supposed to say \"Who's there?\"! " +
-			    "Try again. Knock! Knock!";
-            }
-        } else if (state == SENTCLUE) {
-            if (theInput.equalsIgnoreCase(clues[currentJoke] + " who?")) {
-                theOutput = answers[currentJoke] + " Want another? (y/n)";
-                state = ANOTHER;
-            } else {
-                theOutput = "You're supposed to say \"" +
-			    clues[currentJoke] +
-			    " who?\"" +
-			    "! Try again. Knock! Knock!";
-                state = SENTKNOCKKNOCK;
-            }
-        } else if (state == ANOTHER) {
-            if (theInput.equalsIgnoreCase("y")) {
-                theOutput = "Knock! Knock!";
-                if (currentJoke == (NUMJOKES - 1))
-                    currentJoke = 0;
-                else
-                    currentJoke++;
-                state = SENTKNOCKKNOCK;
-            } else {
-                theOutput = "Bye.";
-                state = WAITING;
-            }
+    public String processInput(String input) {
+        //for changing of state
+        switch (input) {
+            case "ASCII":
+                state = CodeProtocolState.AC;
+                return "ASCII: OK";
+            case "AC":
+                state = CodeProtocolState.AC;
+                return "CHANGE: OK\nASCII: OK";
+            case "CA":
+                state = CodeProtocolState.CA;
+                return "CHANGE: OK\nASCII: OK";
+            case "BYE":
+                state = CodeProtocolState.Waiting;
+                return "BYE: OK";
+            case "END":
+                state = CodeProtocolState.End;
+                return "END: OK";
         }
-        return theOutput;
+
+        //processing current state
+        Matcher m;
+        switch (state) {
+            case AC:
+                m = acPattern.matcher(input);
+                if (m.matches()) {
+                    return "" + (int)input.charAt(0) + "\nASCII: OK";
+                }
+                return "ERR\nASCII: OK";
+            case CA:
+                //get char code from input
+                try {
+                    byte code = Byte.parseByte(input);
+                    String str = new String(new byte[] { code });
+                    m = acPattern.matcher(str);
+                    if (m.matches()) {
+                        return str + "\nASCII: OK";
+                    }
+                }
+                catch (NumberFormatException e) { }
+                return "ERR\nASCII: OK";
+        }
+
+        //shouldn't get here
+        return null;
+    }
+
+    public CodeProtocolState getState() {
+        return state;
     }
 }
