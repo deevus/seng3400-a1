@@ -10,7 +10,7 @@ class CodeConverter {
 
         int portNumber = Integer.parseInt(args[0]);
 
-        boolean ending = startServer(portNumber);
+        boolean ending = false;
         while (!ending) {
             ending = startServer(portNumber);
         }
