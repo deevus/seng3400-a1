@@ -3,12 +3,20 @@ import java.net.*;
 
 class CodeConverter {
     public static void main(String[] args) {
-        if (args.length != 1) {
+        int portNumber = 0;
+        try {
+            portNumber = args.length == 0 ? 1050 : Integer.parseInt(args[0]);
+            if (portNumber < 1024) {
+                System.err.println("Port number must be greater than 1023");
+                System.exit(1);
+            }
+        } catch (Exception e ) {
             System.err.println("Usage: java CodeConverter <port number>");
+            System.err.println("  <port number>: defaults to 1050");
             System.exit(1);
         }
 
-        int portNumber = Integer.parseInt(args[0]);
+        System.out.println("Hosting CodeConverter on port " + portNumber + "...");
 
         boolean ending = false;
         while (!ending) {

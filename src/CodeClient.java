@@ -3,14 +3,27 @@ import java.io.*;
 
 class CodeClient {
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.err.println(
-            "Usage: java CodeClient <host name> <port number>");
-            System.exit(1);
-        }
 
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+        String hostName = null;
+        int portNumber = 0;
+
+        try {
+
+            hostName = args.length < 1 ? "localhost" : args[0];
+            portNumber = args.length < 2 ? 1050 : Integer.parseInt(args[1]);
+            if (portNumber < 1024) {
+                System.err.println("Port number must be greater than 1023");
+                System.exit(1);
+            }
+
+        } catch (Exception e) {
+
+            System.err.println("Usage: java CodeClient <host name> <port number>");
+            System.err.println("    <host name>: defaults to localhost");
+            System.err.println("  <port number>: defaults to 1050");
+            System.exit(1);
+
+        }
 
         try (
             Socket socket = new Socket(hostName, portNumber);
@@ -56,7 +69,7 @@ class CodeClient {
             System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " +
-            hostName);
+            hostName + " on port " + portNumber);
             System.exit(1);
         }
     }
